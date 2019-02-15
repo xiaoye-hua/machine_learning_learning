@@ -1,0 +1,6 @@
+.ipynb_checkpoints/
+
+20190215_yolo_object_detection/yolo-coco/*
+20190215_yolo_object_detection/videos/*
+
+!.gitkeep
