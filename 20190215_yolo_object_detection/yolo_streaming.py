@@ -24,7 +24,9 @@ if __name__ == '__main__':
     args = vars(ap.parse_args())
 
     # load the COCO class labels our YOLO model was trained on
-    labelsPath = os.path.sep.join([args["yolo"], "coco.names"])
+    labelsPath = os.path.sep.join([args["yolo"],
+                                   "coco.names"
+                                   ])
     LABELS = open(labelsPath).read().strip().split("\n")
 
     # initialize a list of colors to represent each possible class label
@@ -33,9 +35,14 @@ if __name__ == '__main__':
                                dtype="uint8")
 
     # derive the paths to the YOLO weights and model configuration
-    weightsPath = os.path.sep.join([args["yolo"], "yolov3-tiny.weights"])
-    configPath = os.path.sep.join([args["yolo"], "yolov3-tiny.cfg"])
-
+    weightsPath = os.path.sep.join([args["yolo"],
+                                    "yolov3-tiny.weights"
+                                    # "card_yolov3-voc_900.weights"
+                                    ])
+    configPath = os.path.sep.join([args["yolo"],
+                                   "yolov3-tiny.cfg"
+                                   # "card_yolov3-voc.cfg"
+                                   ])
     # load our YOLO object detector trained on COCO dataset (80 classes)
     # and determine only the *output* layer names that we need from YOLO
     print("[INFO] loading YOLO from disk...")
@@ -51,11 +58,13 @@ if __name__ == '__main__':
 
     cv2.namedWindow("camera", 1)
     # 开启ip摄像头
-    video = "http://admin:admin@192.168.1.100:8081/"  # 此处@后的ipv4 地址需要修改为自己的地址
-    vs = cv2.VideoCapture(video)
+    video = "http://admin:admin@192.168.32.169:8081/"  # 此处@后的ipv4 地址需要修改为自己的地址
+    vs = cv2.VideoCapture(
+        # video
+        0
+    )
     writer = None
     (W, H) = (None, None)
-
     num = 0
     while True:
         grabbed, frame = vs.read()

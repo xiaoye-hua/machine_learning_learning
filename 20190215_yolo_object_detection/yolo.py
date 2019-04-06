@@ -1,5 +1,5 @@
 
-# python yolo.py --image=./images/person.jpg --yolo=./yolo-coco/ --confidence=0.1
+# python yolo.py --image=./images/person.jpg --yolo=./yolo-coco --confidence=0.1
 
 
 # import the necessary packages
@@ -23,7 +23,9 @@ args = vars(ap.parse_args())
 
 
 # load the COCO class labels our YOLO model was trained on
-labelsPath = os.path.sep.join([args["yolo"], "coco.names"])
+labelsPath = os.path.sep.join([args["yolo"],
+							   "cards.names"
+							   ])
 LABELS = open(labelsPath).read().strip().split("\n")
 
 # initialize a list of colors to represent each possible class label
@@ -31,8 +33,14 @@ np.random.seed(42)
 COLORS = np.random.randint(0, 255, size=(len(LABELS), 3),
 	dtype="uint8")
 # derive the paths to the YOLO weights and model configuration
-weightsPath = os.path.sep.join([args["yolo"], "yolov3-tiny.weights"])
-configPath = os.path.sep.join([args["yolo"], "yolov3-tiny.cfg"])
+weightsPath = os.path.sep.join([args["yolo"],
+								# "yolov3-tiny.weights"
+								"card_yolov3-voc_30000.weights"
+								])
+configPath = os.path.sep.join([args["yolo"],
+							   # "yolov3-tiny.cfg"
+							   "card_yolov3-voc.cfg"
+							   ])
 
 # load our YOLO object detector trained on COCO dataset (80 classes)
 print("[INFO] loading YOLO from disk...")
