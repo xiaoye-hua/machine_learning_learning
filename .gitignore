@@ -1,5 +1,5 @@
 .ipynb_checkpoints/
-
+.idea/*
 20190215_yolo_object_detection/yolo-coco/*
 20190215_yolo_object_detection/videos/*
 pyqt/original_pdf_image/*
