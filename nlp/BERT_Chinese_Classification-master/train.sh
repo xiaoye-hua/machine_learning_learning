@@ -8,6 +8,7 @@ python run_classifier.py \
   --output_dir=sim_model \
   --do_train=true \
   --do_eval=true \
+  --do_export_model=true \
   --init_checkpoint=../data_model/chinese_L-12_H-768_A-12/bert_model.ckpt \
   --max_seq_length=70 \
   --train_batch_size=1 \

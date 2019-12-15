@@ -23,7 +23,7 @@ import csv
 import os
 import modeling
 import tokenization
-from model_fn_builer import model_fn_builder
+from model_fn_builder import model_fn_builder
 import tensorflow as tf
 import pandas as pd
 
@@ -54,6 +54,7 @@ flags.DEFINE_string(
 
 ## Other parameters
 
+
 flags.DEFINE_string(
     "init_checkpoint", None,
     "Initial checkpoint (usually from a pre-trained BERT model).")
@@ -70,6 +71,10 @@ flags.DEFINE_integer(
     "than this will be padded.")
 
 flags.DEFINE_bool("do_train", False, "Whether to run training.")
+flags.DEFINE_bool(
+    "do_export_model", False,
+    "Initial checkpoint (usually from a pre-trained BERT model)."
+)
 
 flags.DEFINE_bool("do_eval", False, "Whether to run eval on the dev set.")
 
@@ -453,7 +458,10 @@ class ColaProcessor(DataProcessor):
         return examples
 
 
-def convert_single_example(ex_index, example, label_list, max_seq_length,
+def convert_single_example(ex_index,
+                           example,
+                           label_list,
+                           max_seq_length,
                            tokenizer):
     """Converts a single `InputExample` into a single `InputFeatures`."""
 
@@ -565,8 +573,12 @@ def file_based_convert_examples_to_features(
         if ex_index % 10000 == 0:
             tf.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
 
-        feature = convert_single_example(ex_index, example, label_list,
-                                         max_seq_length, tokenizer)
+        feature = convert_single_example(ex_index,
+                                         example,
+                                         label_list,
+                                         max_seq_length,
+                                         tokenizer
+                                         )
 
         def create_int_feature(values):
             f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
@@ -585,8 +597,12 @@ def file_based_convert_examples_to_features(
     writer.close()
 
 
-def file_based_input_fn_builder(input_file, seq_length, is_training,
-                                drop_remainder):
+def file_based_input_fn_builder(input_file,
+                                seq_length,
+                                is_training,
+                                drop_remainder,
+                                batch_size
+                                ):
     """Creates an `input_fn` closure to be passed to TPUEstimator."""
 
     name_to_features = {
@@ -611,9 +627,11 @@ def file_based_input_fn_builder(input_file, seq_length, is_training,
 
         return example
 
-    def input_fn(params):
+    def input_fn(
+            # params
+                 ):
         """The actual input function."""
-        batch_size = params["batch_size"]
+        # batch_size = params["batch_size"]
 
         # For training, we want a lot of parallel reading and shuffling.
         # For eval, we want no shuffling and parallel reading doesn't matter.
@@ -802,26 +820,41 @@ def main(_):
 
     # If TPU is not available, this will fall back to normal Estimator on CPU
     # or GPU.
-    estimator = tf.contrib.tpu.TPUEstimator(
-        use_tpu=FLAGS.use_tpu,
-        model_fn=model_fn,
-        config=run_config,
-        train_batch_size=FLAGS.train_batch_size,
-        eval_batch_size=FLAGS.eval_batch_size,
-        predict_batch_size=FLAGS.predict_batch_size
-    )
+    # estimator = tf.contrib.tpu.TPUEstimator(
+    #     use_tpu=FLAGS.use_tpu,
+    #     model_fn=model_fn,
+    #     config=run_config,
+    #     train_batch_size=FLAGS.train_batch_size,
+    #     eval_batch_size=FLAGS.eval_batch_size,
+    #     predict_batch_size=FLAGS.predict_batch_size
+    # )
 
     estimator = tf.estimator.Estimator(
         model_fn=model_fn,
         config=run_config,
-
-
     )
+
+    def serving_input_receiver_fn():
+        feature_map = {}
+        # for i in range(1):
+        key_lst = ["input_ids", "input_mask", "segment_ids", "label_ids"]
+        for key in key_lst:
+            feature_map[key] = tf.placeholder(tf.int64, shape=[1, FLAGS.max_seq_length], name=key)
+        # feature_map[f'feature{0}'] = tf.placeholder(tf.float32, name=f'feature{0}')
+        return tf.estimator.export.build_raw_serving_input_receiver_fn(feature_map)
+
+    if FLAGS.do_export_model:
+        estimator.export_savedmodel(
+            "models",
+            serving_input_receiver_fn=serving_input_receiver_fn()
+        )
 
     if FLAGS.do_train:
         train_file = os.path.join(FLAGS.output_dir, "train.tf_record")
         file_based_convert_examples_to_features(
-            train_examples, label_list, FLAGS.max_seq_length, tokenizer, train_file)
+            train_examples, label_list, FLAGS.max_seq_length, tokenizer,
+            train_file,
+        )
         tf.logging.info("***** Running training *****")
         tf.logging.info("  Num examples = %d", len(train_examples))
         tf.logging.info("  Batch size = %d", FLAGS.train_batch_size)
@@ -830,7 +863,9 @@ def main(_):
             input_file=train_file,
             seq_length=FLAGS.max_seq_length,
             is_training=True,
-            drop_remainder=True)
+            drop_remainder=True,
+            batch_size=FLAGS.train_batch_size
+        )
         estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
 
     if FLAGS.do_eval:
@@ -868,7 +903,9 @@ def main(_):
             input_file=eval_file,
             seq_length=FLAGS.max_seq_length,
             is_training=False,
-            drop_remainder=eval_drop_remainder)
+            drop_remainder=eval_drop_remainder,
+            batch_size=FLAGS.eval_batch_size
+        )
 
         result = estimator.evaluate(input_fn=eval_input_fn, steps=eval_steps)
 
@@ -906,7 +943,9 @@ def main(_):
             input_file=predict_file,
             seq_length=FLAGS.max_seq_length,
             is_training=False,
-            drop_remainder=predict_drop_remainder)
+            drop_remainder=predict_drop_remainder,
+            batch_size=FLAGS.predict_batch_size
+        )
 
         result = estimator.predict(input_fn=predict_input_fn)
 
