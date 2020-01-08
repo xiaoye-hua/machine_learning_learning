@@ -138,3 +138,5 @@ nlp/.idea/*
 pyqt/original_pdf_image/*
 !.gitkeep
 data/*
+20190215_yolo_object_detection/.idea/*
+20190215_yolo_object_detection/output/*
