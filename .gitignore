@@ -141,3 +141,4 @@ data/*
 20190215_yolo_object_detection/.idea/*
 20190215_yolo_object_detection/output/*
 pretrained_models/*
+nlp/.idea/*
