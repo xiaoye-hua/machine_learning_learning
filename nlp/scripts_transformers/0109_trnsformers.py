@@ -59,11 +59,11 @@ model_setting_dict = {
         "../../pretrained_models/nlp/uncased_L-12_H-768_A-12/"
     ]
 }
-# model_type = "albert"
-# model_index = "albert-base-v2"
+model_type = "albert"
+model_index = "albert-base-v2"
 
-model_type = "bert"
-model_index = "bert-base-uncased"
+# model_type = "bert"
+# model_index = "bert-base-uncased"
 # model_index = "bert-base-chinese"
 
 # script parameters
@@ -121,10 +121,10 @@ model = model_setting_dict[model_type][2].from_pretrained(model_index, config=co
 #############################
 
 data, info = tensorflow_datasets.load(
-    "sst2",
-    data_dir="../../data/nlp/glue",
-    download=False,
-    # f'glue/{TFDS_TASK}',
+    # "sst2",
+    # data_dir="../../data/nlp/glue",
+    # download=False,
+    f'glue/{TFDS_TASK}',
     with_info=True,
     # data_dir="../../data/nlp"
 )
@@ -159,8 +159,12 @@ model.compile(optimizer=opt, loss=loss, metrics=[metric])
 train_steps = train_examples//BATCH_SIZE
 valid_steps = valid_examples//EVAL_BATCH_SIZE
 
-history = model.fit(train_dataset, epochs=EPOCHS, steps_per_epoch=train_steps,
-                    validation_data=valid_dataset, validation_steps=valid_steps)
+history = model.fit(
+    train_dataset,
+    epochs=EPOCHS,
+    steps_per_epoch=train_steps,
+                    validation_data=valid_dataset,
+    validation_steps=valid_steps)
 
 # Save TF2 model
 os.makedirs('./save/', exist_ok=True)
