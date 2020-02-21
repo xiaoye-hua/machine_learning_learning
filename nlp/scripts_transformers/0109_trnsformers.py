@@ -79,8 +79,14 @@ if TASK == "sst-2":
     TFDS_TASK = "sst2"
 elif TASK == "sts-b":
     TFDS_TASK = "stsb"
-else: 
-    TFDS_TASK = TASK
+else: data, info = tensorflow_datasets.load(
+    # "sst2",
+    # data_dir="../../data/nlp/glue",
+    # download=False,
+    f'glue/{TFDS_TASK}',
+    with_info=True,
+    # data_dir="../../data/nlp"
+)
 
 num_labels = len(glue_processors[TASK]().get_labels())
 print(f"Num of lables: {num_labels}")
@@ -92,13 +98,13 @@ tf.config.optimizer.set_experimental_options({"auto_mixed_precision": USE_AMP})
 #    load model
 
 # 1. load remote
-# 2. download & load
+# 2. download & loadhttps://s3.amazonaws.com/models.huggingface.co
 # 3. download checkpoint & load
 ##################################
 # 1. load remote -> success
-config = model_setting_dict[model_type][0].from_pretrained(model_index, num_labels=num_labels)
-tokenizer = model_setting_dict[model_type][1].from_pretrained(model_index)
-model = model_setting_dict[model_type][2].from_pretrained(model_index, config=config)
+# config = model_setting_dict[model_type][0].from_pretrained(model_index, num_labels=num_labels)
+# tokenizer = model_setting_dict[model_type][1].from_pretrained(model_index)
+# model = model_setting_dict[model_type][2].from_pretrained(model_index, config=config)
 
 # 2. download & load  -> failed
 # tokenizer = model_setting_dict[model_type][1].from_pretrained(model_setting_dict[model_type][3])
@@ -107,12 +113,18 @@ model = model_setting_dict[model_type][2].from_pretrained(model_index, config=co
 #                                                           )
 
 # 3. download checkpoint & load -> failed
-# config = BertConfig.from_json_file("../../pretrained_models/nlp/uncased_L-12_H-768_A-12/bert_config.json")
-# tokenizer = BertTokenizer.from_pretrained("../../pretrained_models/nlp/uncased_L-12_H-768_A-12/")
+config = BertConfig.from_json_file("../../pretrained_models/nlp/uncased_L-12_H-768_A-12/bert_config.json")
+tokenizer = BertTokenizer.from_pretrained("../../pretrained_models/nlp/uncased_L-12_H-768_A-12/")
+model = TFBertForSequenceClassification.from_pretrained(
+    "../../pretrained_models/nlp/uncased_L-12_H-768_A-12/",
+    from_pt=False,
+    config=config
+)
+# config = BertConfig.from_json_file("../../pretrained_models/nlp/albert_base_v1/bert_config.json")
+# tokenizer = BertTokenizer.from_pretrained("../../pretrained_models/nlp/albert_base_v1/")
 # model = TFBertForSequenceClassification.from_pretrained(
-# "../../pretrained_models/nlp/uncased_L-12_H-768_A-12/",
-#     # model_setting_dict[model_type][3]
-#     # from_tf=True,
+#     "../../pretrained_models/nlp/albert_base_v1/",
+#     from_pt=False,
 #     config=config
 # )
 
@@ -126,7 +138,6 @@ data, info = tensorflow_datasets.load(
     # download=False,
     f'glue/{TFDS_TASK}',
     with_info=True,
-    # data_dir="../../data/nlp"
 )
 train_examples = info.splits['train'].num_examples
 # MNLI expects either validation_matched or validation_mismatched
