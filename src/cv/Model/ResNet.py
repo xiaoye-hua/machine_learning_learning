@@ -9,30 +9,104 @@ from tensorflow.keras import (
     Model
 )
 
-#
-# class ResdualBlock(layers):
-#     def __call__(self, *args, **kwargs):
-#         pass
+
+class ConvBlock(Model):
+    def __init__(self, filters):
+        super(ConvBlock, self).__init__()
+        self.c1 = layers.Conv2D(
+            filters=filters,
+            kernel_size=(3, 3),
+            data_format="channels_last",
+            strides=[1, 1],
+            padding="same",
+            # use_bias=False
+        )
+        self.bn = layers.BatchNormalization()
+        self.activation = layers.Activation("relu")
+
+    # def call(self, inputs):
+    def call(self, inputs, training=None, mask=None):
+        x = self.c1(inputs)
+        for layer in [
+            self.bn,
+            self.activation
+        ]:
+            x = layer(x)
+        return x
+
+
+class ResidualBlock(Model):
+    def __init__(self, filters):
+        super(ResidualBlock, self).__init__()
+        self.conv1 = layers.Conv2D(
+            filters=filters,
+            kernel_size=(3, 3),
+            data_format="channels_last",
+            strides=[1, 1],
+            padding="same"
+        )
+        self.bn1 = layers.BatchNormalization()
+        self.activation1 = layers.Activation("relu")
+        self.conv2 = layers.Conv2D(
+            filters=filters,
+            kernel_size=(3, 3),
+            data_format="channels_last",
+            strides=[1, 1],
+            padding="same"
+        )
+        self.bn2 = layers.BatchNormalization()
+        self.activation2 = layers.Activation("relu")
+
+    def call(self, inputs, training=None, mask=None):
+        x = self.conv1(inputs)
+        for layer in [
+            self.bn1,
+            self.activation1,
+            self.conv2,
+            self.bn2
+        ]:
+            x = layer(x)
+        return self.activation2(tf.add(inputs, x))
 
 
 class ResNet(Model):
-    def __init__(self, label_num):
+    def __init__(self, label_num, res_block_num, conv_filter_num):
         super(ResNet, self).__init__()
-        # self.ResBlock1 = ResdualBlock()
-        # self.ResBlock2
-        self.cnn = layers.Conv2D(filters=10, kernel_size=(3, 3))
-        self.avg_pooling = layers.AveragePooling2D()
-        self.dense = layers.Dense(label_num)
+        self.con_block1 = ConvBlock(filters=conv_filter_num)
+        self.res_block_lst = []
+        for _ in range(res_block_num):
+            self.res_block_lst.append(
+                ResidualBlock(filters=conv_filter_num)
+            )
+        self.con_block2 = ConvBlock(filters=2)
+        self.flat = layers.Flatten()
+        self.dense = layers.Dense(label_num, activation="softmax")
 
     def call(self, inputs, training=None, mask=None):
-        # x = self.ResBlock1(inputs)
-        x = self.cnn(inputs)
-        x = self.avg_pooling(x)
-        x = self.dense(x)
+        x = self.con_block1(inputs)
+        for layer in self.res_block_lst:
+            x = layer(x)
+        for layer in [
+            self.con_block2,
+            self.flat,
+            self.dense
+        ]:
+            x = layer(x)
         return x
 
 
 if __name__ == "__main__":
-    label_num = 2
-    model = ResNet(label_num=label_num)
+    conv_block = ConvBlock(filters=10)
+    conv_block(tf.ones(shape=(1, 32, 32, 3)))
+    # print(conv_block.summary())
+
+    residual_block = ResidualBlock(filters=10)
+    residual_block(tf.ones(shape=(1, 32, 32, 10)))
+    # print(residual_block.summary())
+    model = ResNet(
+        label_num=2,
+        res_block_num=5,
+        conv_filter_num=10
+    )
+    model(tf.ones(shape=(1, 32, 32, 10)))
     print(model.summary())
