@@ -69,25 +69,58 @@ class ResidualBlock(Model):
         return self.activation2(tf.add(inputs, x))
 
 
+# class ResNet(Model):
+#     def __init__(self, label_num=10, res_block_num=10, conv_filter_num=10):
+#         super(ResNet, self).__init__()
+#         self.con_block1 = ConvBlock(filters=conv_filter_num)
+#         self.res_block_lst = []
+#         for _ in range(res_block_num):
+#             self.res_block_lst.append(
+#                 ResidualBlock(filters=conv_filter_num)
+#             )
+#         self.con_block2 = ConvBlock(filters=2)
+#         self.flat = layers.Flatten()
+#         self.dense = layers.Dense(label_num, activation="softmax")
+#
+#     def call(self, inputs, training=None, mask=None):
+#         x = self.con_block1(inputs)
+#         for layer in self.res_block_lst:
+#             x = layer(x)
+#         for layer in [
+#             self.con_block2,
+#             self.flat,
+#             self.dense
+#         ]:
+#             x = layer(x)
+#         return x
 class ResNet(Model):
-    def __init__(self, label_num, res_block_num, conv_filter_num):
+    def __init__(self, label_num, res_block_num, conv_filter_num, channel_num):
         super(ResNet, self).__init__()
-        self.con_block1 = ConvBlock(filters=conv_filter_num)
-        self.res_block_lst = []
-        for _ in range(res_block_num):
-            self.res_block_lst.append(
-                ResidualBlock(filters=conv_filter_num)
-            )
-        self.con_block2 = ConvBlock(filters=2)
+        self.channel_num = channel_num
+        self.conv1 = layers.Conv2D(
+            filters=conv_filter_num,
+            kernel_size=(3, 3),
+            data_format="channels_last",
+            strides=[1, 1],
+            padding="same"
+        )
+        # self.con_block1 = ConvBlock(filters=conv_filter_num)
+        # self.res_block_lst = []
+        # for _ in range(res_block_num):
+        #     self.res_block_lst.append(
+        #         ResidualBlock(filters=conv_filter_num)
+        #     )
+        # self.con_block2 = ConvBlock(filters=2)
         self.flat = layers.Flatten()
         self.dense = layers.Dense(label_num, activation="softmax")
 
     def call(self, inputs, training=None, mask=None):
-        x = self.con_block1(inputs)
-        for layer in self.res_block_lst:
-            x = layer(x)
+        # s_planes = tf.reshape(inputs,[-1, SUIT_NUM, CARD_SET_NUM, self.channel_num])
+        x = self.conv1(inputs)
+        # for layer in self.res_block_lst:
+        #     x = layer(x)
         for layer in [
-            self.con_block2,
+            # self.con_block2,
             self.flat,
             self.dense
         ]:
@@ -96,12 +129,12 @@ class ResNet(Model):
 
 
 if __name__ == "__main__":
-    conv_block = ConvBlock(filters=10)
-    conv_block(tf.ones(shape=(1, 32, 32, 3)))
-    # print(conv_block.summary())
-
-    residual_block = ResidualBlock(filters=10)
-    residual_block(tf.ones(shape=(1, 32, 32, 10)))
+    # conv_block = ConvBlock(filters=10)
+    # conv_block(tf.ones(shape=(1, 32, 32, 3)))
+    # # print(conv_block.summary())
+    #
+    # residual_block = ResidualBlock(filters=10)
+    # residual_block(tf.ones(shape=(1, 32, 32, 10)))
     # print(residual_block.summary())
     model = ResNet(
         label_num=2,
@@ -110,3 +143,6 @@ if __name__ == "__main__":
     )
     model(tf.ones(shape=(1, 32, 32, 10)))
     print(model.summary())
+    estimator = tf.keras.estimator.model_to_estimator(
+        keras_model=model
+    )
