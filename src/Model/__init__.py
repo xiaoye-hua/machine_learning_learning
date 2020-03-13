@@ -3,7 +3,7 @@
 # @Author  : Hua Guo
 # @Time    : 2019/12/25 下午9:27
 # @Disc    :
-from src.cv.Model.CNNModel import CNNModel
+from src.Model.CNNModel import CNNModel
 
 model_builder_dict = {
     "cnn_model": CNNModel

@@ -19,7 +19,7 @@ cd ~
 git clone git@github.com:hamelsmu/Docker_Tutorial.git
 ```
 
-change into `Docker_Tutorial/gpu_tutorial` directory and run [setup script](./build_container.sh)
+change into `Docker_Tutorial/gpu_tutorial` directory and run [setup script](build_container.sh)
 
 ```
 cd ~/Docker_Tutorial/gpu_tutorial

@@ -3,11 +3,9 @@
 # @Author  : Hua Guo
 # @Time    : 2019/12/25 下午9:33
 # @Disc    :
-import tensorflow as tf
-from tensorflow.keras import layers, models, Model
+from tensorflow.keras import layers, Model
 
 from src.BaseClass.ModelBuilder import ModelBuilder
-from src.cv.Model.ResNet import ResNet
 
 
 class CNN(Model):
