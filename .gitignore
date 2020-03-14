@@ -145,8 +145,10 @@ nlp/.idea/*
 .idea/*
 project/*
 target/*
-MOOC/*
+#MOOC/*
 **/.idea
 **/project
 **/target
 **/resources
+**/build/*
+**/data/*
