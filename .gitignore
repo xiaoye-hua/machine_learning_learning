@@ -146,6 +146,7 @@ nlp/.idea/*
 project/*
 target/*
 #MOOC/*
+## ignore all the file with the same names as follows
 **/.idea
 **/project
 **/target
