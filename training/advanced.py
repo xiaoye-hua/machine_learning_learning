@@ -115,6 +115,22 @@ train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy
 
 test_loss = tf.keras.metrics.Mean(name='test_loss')
 test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
+metrics = [
+  train_accuracy
+]
+model.compile(
+    optimizer=optimizer,
+    loss = loss_object,
+    metrics=metrics
+)
+model.fit(
+    train_ds,
+    validation_data=test_ds
+)
+
+
+# tf.keras.models.save_model(models, model_dir)
+# model.fit()
 #
 # """使用 `tf.GradientTape` 来训练模型："""
 #

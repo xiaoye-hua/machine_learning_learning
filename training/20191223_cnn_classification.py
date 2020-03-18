@@ -60,17 +60,18 @@ test_dataset = tf.data.Dataset.from_tensor_slices((test_images, test_labels)).ba
 # model = ResNet50(
 #     class_num=label_num
 # )
+train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='accuracy')
+
 model = CNN()
 model.compile(
     optimizer="adam",
     loss = "sparse_categorical_crossentropy",
-    metircs=["accuracy"]
+    metrics=[train_accuracy]
 )
 model.fit(
     datasets,
     validation_data=test_dataset
 )
 
-
-tf.keras.models.save_model(models, model_dir)
-# models.save(model_dir)
+model.save(model_dir)
+# tf.keras.models.save_model(models, model_dir)
