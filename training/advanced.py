@@ -69,6 +69,11 @@ from tensorflow.keras import Model
 
 """加载并准备 [MNIST 数据集](http://yann.lecun.com/exdb/mnist/)。"""
 
+
+
+
+model_dir = "models/0318"
+
 mnist = tf.keras.datasets.mnist
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -127,6 +132,7 @@ model.fit(
     train_ds,
     validation_data=test_ds
 )
+model.save(model_dir)
 
 
 # tf.keras.models.save_model(models, model_dir)

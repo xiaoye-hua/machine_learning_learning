@@ -25,7 +25,7 @@ if debug:
     train_epoches = 1
 else:
     train_epoches = 3
-model_dir = "models"
+model_dir = "models/0318"
 
 
 (train_images, train_labels), (test_images, test_labels) = datasets.cifar10.load_data()
