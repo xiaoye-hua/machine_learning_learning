@@ -63,7 +63,7 @@ Note: 我们的 TensorFlow 社区翻译了这些文档。因为社区翻译是�
 # from __future__ import absolute_import, division, print_function, unicode_literals
 
 import tensorflow as tf
-
+import os
 from tensorflow.keras.layers import Dense, Flatten, Conv2D
 from tensorflow.keras import Model
 
@@ -71,23 +71,43 @@ from tensorflow.keras import Model
 
 
 
-
-model_dir = "models/0318"
+debug = True
+debug_train_data_length = 10000
+debug_test_data_length = 5000
+index = "0320"
+model_dir = os.path.join("models", index)
+tensorboard_dir = os.path.join("logs", index)
+batch_size = 32
 
 mnist = tf.keras.datasets.mnist
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 x_train, x_test = x_train / 255.0, x_test / 255.0
 
+if debug:
+    x_train = x_train[:debug_train_data_length, :, :]
+    y_train = y_train[:debug_train_data_length]
+    x_test = x_test[:debug_test_data_length, :, :]
+    y_test = y_test[:debug_test_data_length]
+
+print(f"Train dataset shape: {x_train.shape}")
+print(f"Train label shape: {y_train.shape}")
+print(f"Test dataset shape: {x_test.shape}")
+
 # Add a channels dimension
 x_train = x_train[..., tf.newaxis]
 x_test = x_test[..., tf.newaxis]
 
+print(f"Train dataset shape: {x_train.shape}")
+print(f"Train label shape: {y_train.shape}")
+print(f"Test dataset shape: {x_test.shape}")
+
+
 """使用 `tf.data` 来将数据集切分为 batch 以及混淆数据集："""
 
 train_ds = tf.data.Dataset.from_tensor_slices(
-    (x_train, y_train)).shuffle(10000).batch(32)
-test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)
+    (x_train, y_train)).shuffle(10000).batch(batch_size=batch_size)
+test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(batch_size=batch_size)
 
 """使用 Keras [模型子类化（model subclassing） API](https://www.tensorflow.org/guide/keras#model_subclassing) 构建 `tf.keras` 模型："""
 
@@ -115,72 +135,33 @@ optimizer = tf.keras.optimizers.Adam()
 
 """选择衡量指标来度量模型的损失值（loss）和准确率（accuracy）。这些指标在 epoch 上累积值，然后打印出整体结果。"""
 
-train_loss = tf.keras.metrics.Mean(name='train_loss')
-train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
+# train_loss = tf.keras.metrics.Mean(name='train_loss')
+# train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
+#
+# test_loss = tf.keras.metrics.Mean(name='test_loss')
+# test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
 
-test_loss = tf.keras.metrics.Mean(name='test_loss')
-test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
 metrics = [
-  train_accuracy
+  "accuracy"
 ]
+
+callbacks = [
+    tf.keras.callbacks.TensorBoard(log_dir=tensorboard_dir)
+]
+
 model.compile(
     optimizer=optimizer,
     loss = loss_object,
-    metrics=metrics
+    metrics=metrics,
 )
 model.fit(
     train_ds,
-    validation_data=test_ds
+    callbacks=callbacks
 )
+model.evaluate(
+    x=test_ds
+)
+
+print(f"Saving saved model to {model_dir}")
 model.save(model_dir)
 
-
-# tf.keras.models.save_model(models, model_dir)
-# model.fit()
-#
-# """使用 `tf.GradientTape` 来训练模型："""
-#
-# @tf.function
-# def train_step(images, labels):
-#   with tf.GradientTape() as tape:
-#     predictions = model(images)
-#     loss = loss_object(labels, predictions)
-#   gradients = tape.gradient(loss, model.trainable_variables)
-#   optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-#
-#   train_loss(loss)
-#   train_accuracy(labels, predictions)
-#
-# """测试模型："""
-#
-# @tf.function
-# def test_step(images, labels):
-#   predictions = model(images)
-#   t_loss = loss_object(labels, predictions)
-#
-#   test_loss(t_loss)
-#   test_accuracy(labels, predictions)
-#
-# EPOCHS = 10
-#
-# for epoch in range(EPOCHS):
-#   # 在下一个epoch开始时，重置评估指标
-#   train_loss.reset_states()
-#   train_accuracy.reset_states()
-#   test_loss.reset_states()
-#   test_accuracy.reset_states()
-#
-#   for images, labels in train_ds:
-#     train_step(images, labels)
-#
-#   for test_images, test_labels in test_ds:
-#     test_step(test_images, test_labels)
-#
-#   template = 'Epoch {}, Loss: {}, Accuracy: {}, Test Loss: {}, Test Accuracy: {}'
-#   print (template.format(epoch+1,
-#                          train_loss.result(),
-#                          train_accuracy.result()*100,
-#                          test_loss.result(),
-#                          test_accuracy.result()*100))
-#
-# """该图片分类器现在在此数据集上训练得到了接近 98% 的准确率（accuracy）。要了解更多信息，请阅读 [TensorFlow 教程](https://www.tensorflow.org/tutorials/keras)。"""
