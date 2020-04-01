@@ -153,3 +153,4 @@ target/*
 **/resources
 **/build/*
 **/data/*
+./model_finished/*
