@@ -154,3 +154,4 @@ target/*
 **/build/*
 **/data/*
 ./model_finished/*
+./ongoing_notebooks
