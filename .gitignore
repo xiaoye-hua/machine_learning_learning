@@ -155,3 +155,4 @@ target/*
 **/data/*
 ./model_finished/*
 ./ongoing_notebooks
+log
