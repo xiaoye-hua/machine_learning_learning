@@ -4,6 +4,7 @@ from .base_policy import BasePolicy
 from cs285.infrastructure.tf_utils import build_mlp
 import tensorflow_probability as tfp
 
+
 class MLPPolicy(BasePolicy):
 
     def __init__(self,
@@ -108,17 +109,56 @@ class MLPPolicy(BasePolicy):
     # query the policy with observation(s) to get selected action(s)
     def get_action(self, obs):
 
-        # TODO: GETTHIS from HW1
+        if len(obs.shape)>1:
+            observation = obs
+        else:
+            observation = obs[None]
+
+        # TODO return the action that the policy prescribes --> FINISHED
+        # HINT1: you will need to call self.sess.run
+        # HINT2: the tensor we're interested in evaluating is self.sample_ac
+        # HINT3: in order to run self.sample_ac, it will need observation fed into the feed_dict
+        return self.sess.run(self.sample_ac, feed_dict={self.observations_pl:observation})
 
 #####################################################
 #####################################################
 
-# class MLPPolicySL(MLPPolicy):
 
-    # TODO: GETTHIS from HW1 (or comment it out, since you don't need it for this homework)
+class MLPPolicySL(MLPPolicy):
+
+    """
+        This class is a special case of MLPPolicy,
+        which is trained using supervised learning.
+        The relevant functions to define are included below.
+    """
+
+    def define_placeholders(self):
+        # placeholder for observations
+        self.observations_pl = tf.placeholder(shape=[None, self.ob_dim], name="ob", dtype=tf.float32)
+
+        # placeholder for actions
+        self.actions_pl = tf.placeholder(shape=[None, self.ac_dim], name="ac", dtype=tf.float32)
+
+        if self.training:
+            self.acs_labels_na = tf.placeholder(shape=[None, self.ac_dim], name="labels", dtype=tf.float32)
+
+    def define_train_op(self):
+        true_actions = self.acs_labels_na
+        predicted_actions = self.sample_ac
+
+        # TODO define the loss that will be used to train this policy  --> FINISHED
+        # HINT1: remember that we are doing supervised learning
+        # HINT2: use tf.losses.mean_squared_error
+        self.loss = tf.losses.mean_squared_error(labels=true_actions, predictions=predicted_actions)
+        self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
+
+    def update(self, observations, actions):
+        assert(self.training, 'Policy must be created with training=True in order to perform training updates...')
+        self.sess.run(self.train_op, feed_dict={self.observations_pl: observations, self.acs_labels_na: actions})
 
 #####################################################
 #####################################################
+
 
 class MLPPolicyPG(MLPPolicy):
 
@@ -157,6 +197,9 @@ class MLPPolicyPG(MLPPolicy):
             # to get [Q_t - b_t]
         # HINT4: don't forget that we need to MINIMIZE this self.loss
             # but the equation above is something that should be maximized
+
+
+
         self.loss = tf.reduce_sum(TODO)
 
         # TODO: define what exactly the optimizer should minimize when updating the policy

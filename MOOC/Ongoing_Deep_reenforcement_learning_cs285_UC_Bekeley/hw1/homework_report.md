@@ -1,7 +1,4 @@
 ## Question 1.2
-ep_len = 1000
-eval_batch_size=5000, namely epoch=5
-
 
 |Task|Mean return (BC)|STD (BC)|Mean return (expert)|STD (expert)|
 |---|---|---|---|---|

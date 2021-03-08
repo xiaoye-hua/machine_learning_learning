@@ -4,6 +4,7 @@ import time
 from cs285.infrastructure.rl_trainer import RL_Trainer
 from cs285.agents.pg_agent import PGAgent
 
+
 class PG_Trainer(object):
 
     def __init__(self, params):
@@ -94,7 +95,6 @@ def main():
     ##################################
 
     logdir_prefix = 'pg_'
-
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data')
 
     if not (os.path.exists(data_path)):

@@ -1,3 +1,4 @@
+# Instructions
 
 1) install package by running:
 
@@ -91,8 +92,8 @@ See the code + the hw pdf for more details.
 5) run code: 
 
 Run the following command for Section 1 (Behavior Cloning):
-$ export PYTHONPATH='.'
-$ python cs285/scripts/run_hw1_behavior_cloning.py --expert_policy_file cs285/policies/experts/Ant.pkl --env_name Ant-v2 --exp_name test_bc_ant --n_iter 1 --expert_data cs285/expert_data/expert_data_Ant-v2.pkl
+export PYTHONPATH='.'
+python cs285/scripts/run_hw1_behavior_cloning.py --expert_policy_file cs285/policies/experts/Ant.pkl --env_name Ant-v2 --exp_name test_bc_ant --n_iter 1 --expert_data cs285/expert_data/expert_data_Ant-v2.pkl
 
 Run the following command for Section 2 (DAGGER):
 (NOTE: the --do_dagger flag, and the higher value for n_iter)
@@ -107,3 +108,9 @@ $ cd cs285/data/<your_log_dir>
 $ tensorboard --logdir .
 
 Then, navigate to shown url to see scalar summaries as plots (in 'scalar' tab), as well as videos (in 'images' tab)
+
+# Notes
+1. --num_agent_train_steps_per_iter: number of training samples per iteration
+2.
+
+

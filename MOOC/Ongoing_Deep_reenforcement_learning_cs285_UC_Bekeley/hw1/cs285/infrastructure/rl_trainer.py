@@ -155,7 +155,7 @@ class RL_Trainer(object):
             train_video_paths: paths which also contain videos for visualization purposes
         """
 
-        # TODO decide whether to load training data or use
+        # TODO decide whether to load training data or use --> FINISHED
         # HINT: depending on if it's the first iteration or not,
             # decide whether to either
                 # load the data. In this case you can directly return as follows

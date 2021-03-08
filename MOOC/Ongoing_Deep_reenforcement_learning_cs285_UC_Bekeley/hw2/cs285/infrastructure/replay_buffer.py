@@ -2,6 +2,7 @@ import numpy as np
 
 from cs285.infrastructure.utils import *
 
+
 class ReplayBuffer(object):
 
     def __init__(self, max_size=1000000):

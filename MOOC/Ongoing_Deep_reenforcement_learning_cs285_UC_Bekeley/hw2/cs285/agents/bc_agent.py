@@ -7,6 +7,7 @@ from cs285.policies.MLP_policy import *
 from cs285.infrastructure.replay_buffer import ReplayBuffer
 from cs285.infrastructure.utils import *
 
+
 class BCAgent(BaseAgent):
     def __init__(self, sess, env, agent_params):
         super(BCAgent, self).__init__()

@@ -154,5 +154,6 @@ target/*
 **/build/*
 **/data/*
 ./model_finished/*
-./ongoing_notebooks
 log
+.DS_Store
+ongoing_notebooks/*
