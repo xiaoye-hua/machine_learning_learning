@@ -3,9 +3,10 @@
 # @Time    : 2021/4/3 2:45 下午
 # @Author  : guohua08
 # @File    : run_q_learing.py
+# On-policy Q learning
 import numpy as np
-from Q_learning.maze_env import Maze
-from Q_learning.RL_brain import QLearningTable
+from Q_learning_Sarsa.maze_env import Maze
+from Q_learning_Sarsa.RL_brain.SarsaRL_brain import SarasTable
 
 def update():
     for episode in range(100):
@@ -25,8 +26,11 @@ def update():
     env.destroy()
 
 if __name__ == "__main__":
+    """
+    on-policy Q learing
+    """
     np.random.seed(2)
     env = Maze()
-    RL_brain = QLearningTable(actions=list(range(env.n_actions)))
+    RL_brain = SarasTable(actions=list(range(env.n_actions)))
     env.after(100, update)
     env.mainloop()

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2021/3/8 7:23 下午
 # @Author  : guohua08
-# @File    : RL_brain.py
+# @File    : QLearningRL_brain.py
 import tensorflow as tf
 import numpy as np
 from BaseClass.RLBrainBase import RLBrainBase
