@@ -17,14 +17,16 @@ def update():
             action = RL_brain.take_action(str(observation))
             observation_, reward, done = env.step(action)
             RL_brain.learn(str(observation), action, str(observation_), reward)
+            observation = observation_
             if done:
                 print(f"Episode: {episode}; total steps: {step}; reward: {reward}")
                 break
     print("Game Over")
+    env.destroy()
 
 if __name__ == "__main__":
     np.random.seed(2)
     env = Maze()
-    RL_brain = QLearningTable(list(range(env.n_actions)))
+    RL_brain = QLearningTable(actions=list(range(env.n_actions)))
     env.after(100, update)
     env.mainloop()
