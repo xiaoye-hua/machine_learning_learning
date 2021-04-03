@@ -4,6 +4,9 @@
 # @Author  : guohua08
 # @File    : run_Cartpole.py
 
+
+# TODO： 相比莫烦老师的代码，我的running_rewards 收敛不稳定
+
 import gym
 import matplotlib.pyplot as plt
 from reinforcement_learning.policy_gradient.RL_brain import PolicyGradient
@@ -12,6 +15,8 @@ total_epsodes = 3000
 exp_name = "CartPole-v0"
 
 env = gym.make(exp_name)
+env.seed(1)
+env = env.unwrapped
 
 print(f"action num: {env.action_space.n}")
 print(f"observation shape: {env.observation_space.shape}")
@@ -19,15 +24,18 @@ print(f"observation shape: {env.observation_space.shape}")
 RL_agent = PolicyGradient(
     label_num=env.action_space.n
     , feature_num=env.observation_space.shape[0]
+    , learning_rate=0.02
+    , reward_decay=0.99
 )
 
 running_rewards_list = []
 total_steps_lst = []
+
 for eps_num in range(total_epsodes):
     observation = env.reset()
     step = 0
     while True:
-        env.render()  #render, show the graph
+        # env.render()  #render, show the graph
         action = RL_agent.take_action(observation)
         # action = env.action_space.sample()
         observation_, rewards, done, info = env.step(action=action)
@@ -38,7 +46,7 @@ for eps_num in range(total_epsodes):
             if step == 0:
                 running_rewards = ep_rs_sum
             else:
-                running_rewards = 0.01 * running_rewards + 0.99 * ep_rs_sum
+                running_rewards = 0.99 * running_rewards + 0.01 * ep_rs_sum
             running_rewards_list.append(running_rewards)
             total_steps_lst.append(total_steps)
             print(f"Episode num: {eps_num}; running rewards: {running_rewards}; total step in this episode: {total_steps}")

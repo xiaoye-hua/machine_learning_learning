@@ -56,8 +56,8 @@ def main():
 
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--env_name', type=str)
-    parser.add_argument('--exp_name', type=str, default='todo')
+    parser.add_argument('--env_name', type=str, default="CartPole-v1")
+    parser.add_argument('--exp_name', type=str, default='test_pg_cartpole')
     parser.add_argument('--n_iter', '-n', type=int, default=200)
         
     parser.add_argument('--reward_to_go', '-rtg', action='store_true')

@@ -6,6 +6,7 @@
 import tensorflow as tf
 import numpy as np
 
+
 class PolicyGradient:
     def __init__(self, feature_num, label_num, learning_rate=0.01, reward_decay=0.95):
         self.feature_num = feature_num
@@ -28,19 +29,29 @@ class PolicyGradient:
             inputs=self.tf_obs
             , units=10
             , activation=tf.nn.tanh
+            , kernel_initializer=tf.random_normal_initializer(mean=0, stddev=0.3)
+            , bias_initializer=tf.constant_initializer(0.1)
+            , name="fc1"
         )
         self.out = tf.layers.dense(
             inputs=layer
             , units=self.label_num
+            , activation=None
+            , kernel_initializer=tf.random_normal_initializer(mean=0, stddev=0.3)
+            , bias_initializer=tf.constant_initializer(0.1)
+            , name="fc2"
         )
         self.out_prob = tf.nn.softmax(logits=self.out)
         with tf.name_scope("loss"):
-            # TODO: softmax + sparse softmax ??
             log = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.out, labels=self.tf_acs)
-            # TODO: different from orginal code
-            loss = tf.math.reduce_sum(-log*self.tf_rs)
+            # TODO: tf details code  --> FINISHED
+            # TODO： 为啥会到这个公式？
+            #log = tf.reduce_sum(-tf.log(self.out) * tf.one_hot(self.tf_acs, self.label_num), axis=1)
+            #   TODO: 网络的区别在？？
+            loss = tf.reduce_mean(log*self.tf_rs)
         with tf.name_scope("train"):
-            self.train_op = tf.train.AdadeltaOptimizer(learning_rate=self.lr).minimize(loss)
+            self.train_op = tf.train.AdamOptimizer(learning_rate=self.lr).minimize(loss)
+
 
     def take_action(self, observation):
         all_prob = self.session.run(self.out_prob, feed_dict={self.tf_obs:observation[np.newaxis, :]})
@@ -56,8 +67,8 @@ class PolicyGradient:
     def learn(self):
         new_rewards = self._discount_and_norm_rewards()
         self.session.run(self.train_op, feed_dict={
-            self.tf_acs: self.actions
-            , self.tf_obs: self.observation
+            self.tf_acs: np.array(self.actions)
+            , self.tf_obs: np.vstack(self.observation)
             , self.tf_rs: new_rewards
         })
         self.actions = []
