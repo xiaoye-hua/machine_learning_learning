@@ -5,10 +5,15 @@
 # @File    : RL_brain.py
 import tensorflow as tf
 import numpy as np
+from BaseClass.RLBrainBase import RLBrainBase
 
 
-class PolicyGradient:
+class PolicyGradient(RLBrainBase):
     def __init__(self, feature_num, label_num, learning_rate=0.01, reward_decay=0.95):
+        super(RLBrainBase, self).__init__()
+
+# class PolicyGradient:
+#     def __init__(self, feature_num, label_num, learning_rate=0.01, reward_decay=0.95):
         self.feature_num = feature_num
         self.label_num = label_num
         self.lr = learning_rate
@@ -51,7 +56,6 @@ class PolicyGradient:
             loss = tf.reduce_mean(log*self.tf_rs)
         with tf.name_scope("train"):
             self.train_op = tf.train.AdamOptimizer(learning_rate=self.lr).minimize(loss)
-
 
     def take_action(self, observation):
         all_prob = self.session.run(self.out_prob, feed_dict={self.tf_obs:observation[np.newaxis, :]})

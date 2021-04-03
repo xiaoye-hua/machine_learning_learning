@@ -9,7 +9,7 @@
 
 import gym
 import matplotlib.pyplot as plt
-from reinforcement_learning.policy_gradient.RL_brain import PolicyGradient
+from policy_gradient.RL_brain import PolicyGradient
 
 total_epsodes = 3000
 exp_name = "CartPole-v0"
