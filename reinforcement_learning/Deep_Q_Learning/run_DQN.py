@@ -15,7 +15,7 @@ def update():
     total_step = 0
     reward_lst = []
     running_reward = -1
-    for episode in range(3):
+    for episode in range(300):
         observation = env.reset()
         step = 0
         action_lst = []
@@ -40,7 +40,7 @@ def update():
                 reward_lst.append(running_reward)
                 print(f"Episode: {episode}; steps for single episode: {step}; reward: {reward}; running_reward:{running_reward}")
                 break
-        print(action_lst)
+        # print(action_lst)
     print("Game Over")
     env.destroy()
     RL_brain.plot_cost()
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         , learning_rate = 0.01
         , reward_decay = 0.9
         , e_greedy = 0.9
-        , replace_target_steps=200
+        , replace_target_iter=200
         , restore_size = 2000
     )
     env.after(100, update)
