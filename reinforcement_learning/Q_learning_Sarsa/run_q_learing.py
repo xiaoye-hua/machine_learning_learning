@@ -8,6 +8,7 @@ import numpy as np
 from Q_learning_Sarsa.maze_env import Maze
 from Q_learning_Sarsa.RL_brain.QLearningRL_brain import QLearningTable
 
+
 def update():
     for episode in range(100):
         observation = env.reset()

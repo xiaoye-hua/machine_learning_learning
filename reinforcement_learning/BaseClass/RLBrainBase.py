@@ -17,3 +17,20 @@ class RLBrainBase(metaclass=ABCMeta):
     @abstractmethod
     def learn(self, **kwargs):
         pass
+
+
+class RLBrainReplayBase(metaclass=ABCMeta):
+    """
+    Base class for RL_brain
+    """
+    @abstractmethod
+    def take_action(self, observation):
+        pass
+
+    @abstractmethod
+    def learn(self, **kwargs):
+        pass
+
+    @abstractmethod
+    def restore_transition(self, **kwargs):
+        pass
